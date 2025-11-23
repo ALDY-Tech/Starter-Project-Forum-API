@@ -122,7 +122,7 @@ describe('ReplyRepositoryPostgres', () => {
 
       // Action & Assert
       await expect(replyRepositoryPostgres.verifyReplyOwner(replyId, userId))
-        .resolves.not.toThrowError();
+        .resolves.not.toThrowError(AuthorizationError);
     });
   });
 
@@ -146,27 +146,44 @@ describe('ReplyRepositoryPostgres', () => {
   describe('getRepliesByCommentIds function', () => {
     it('should return replies for the comments ordered by date ascending', async () => {
       // Arrange
-      const replyDate1 = new Date('2023-01-01T00:00:00.000Z');
-      const replyDate2 = new Date('2023-01-02T00:00:00.000Z');
+      const replyDate1 = new Date("2023-01-01T00:00:00.000Z");
+      const replyDate2 = new Date("2023-01-02T00:00:00.000Z");
 
       await RepliesTableTestHelper.addReply({
-        id: 'reply-456', owner: userId, commentId, date: replyDate2,
+        id: "reply-456",
+        owner: userId,
+        commentId,
+        date: replyDate2,
       });
       await RepliesTableTestHelper.addReply({
-        id: 'reply-123', owner: userId, commentId, date: replyDate1,
+        id: "reply-123",
+        owner: userId,
+        commentId,
+        date: replyDate1,
       });
 
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
       // Action
-      const replies = await replyRepositoryPostgres.getRepliesByCommentIds([commentId]);
+      const replies = await replyRepositoryPostgres.getRepliesByCommentIds([
+        commentId,
+      ]);
 
-      // Assert
-      expect(replies).toHaveLength(2);
-      expect(replies[0].id).toEqual('reply-123');
-      expect(replies[1].id).toEqual('reply-456');
-      expect(replies[0].username).toEqual('dicoding');
+      // Assert replies[0]
+      expect(replies[0].id).toEqual("reply-123");
+      expect(replies[0].username).toEqual("dicoding");
+      expect(replies[0].date).toEqual(replyDate1);
+      expect(replies[0].content).toEqual(content1);
       expect(replies[0].is_delete).toEqual(false);
+      expect(replies[0].comment_id).toEqual(commentId);
+
+      // Assert replies[1]
+      expect(replies[1].id).toEqual("reply-456");
+      expect(replies[1].username).toEqual("dicoding");
+      expect(replies[1].date).toEqual(replyDate2);
+      expect(replies[1].content).toEqual(content2);
+      expect(replies[1].is_delete).toEqual(false);
+      expect(replies[1].comment_id).toEqual(commentId);
     });
 
     it('should return an empty array if no commentIds provided', async () => {
