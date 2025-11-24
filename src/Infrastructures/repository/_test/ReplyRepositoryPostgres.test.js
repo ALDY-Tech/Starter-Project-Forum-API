@@ -122,7 +122,7 @@ describe('ReplyRepositoryPostgres', () => {
 
       // Action & Assert
       await expect(replyRepositoryPostgres.verifyReplyOwner(replyId, userId))
-        .resolves.not.toThrowError(AuthorizationError);
+        .resolves.not.toThrow(AuthorizationError);
     });
   });
 

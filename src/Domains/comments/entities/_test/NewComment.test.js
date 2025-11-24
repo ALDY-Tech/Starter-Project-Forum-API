@@ -9,7 +9,7 @@ describe('NewComment entities', () => {
     };
 
     // Action & Assert
-    expect(() => new NewComment(payload)).toThrowError('NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new NewComment(payload)).toThrow('NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload not meet data type specification', () => {
@@ -21,7 +21,7 @@ describe('NewComment entities', () => {
     };
 
     // Action & Assert
-    expect(() => new NewComment(payload)).toThrowError('NEW_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new NewComment(payload)).toThrow('NEW_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create NewComment entities correctly', () => {

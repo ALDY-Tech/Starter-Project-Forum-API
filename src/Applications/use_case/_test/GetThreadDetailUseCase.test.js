@@ -82,10 +82,10 @@ describe('GetThreadDetailsUseCase', () => {
     const threadDetails = await getThreadDetailsUseCase.execute(useCasePayload);
 
     // Assert
-    expect(mockThreadRepository.verifyAvailableThread).toBeCalledWith(threadId);
-    expect(mockThreadRepository.getThreadById).toBeCalledWith(threadId);
-    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(threadId);
-    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith(['comment-123', 'comment-456']);
+    expect(mockThreadRepository.verifyAvailableThread).toHaveBeenCalledWith(threadId);
+    expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
+    expect(mockCommentRepository.getCommentsByThreadId).toHaveBeenCalledWith(threadId);
+    expect(mockReplyRepository.getRepliesByCommentIds).toHaveBeenCalledWith(['comment-123', 'comment-456']);
 
     // Check Thread Details
     expect(threadDetails).toBeInstanceOf(DetailThread);

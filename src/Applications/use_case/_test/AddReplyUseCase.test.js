@@ -51,10 +51,10 @@ describe('AddReplyUseCase', () => {
       owner: useCasePayload.owner,
     }));
 
-    expect(mockThreadRepository.verifyAvailableThread).toBeCalledWith(useCasePayload.threadId);
+    expect(mockThreadRepository.verifyAvailableThread).toHaveBeenCalledWith(useCasePayload.threadId);
     expect(mockCommentRepository.verifyAvailableCommentInThread)
-      .toBeCalledWith(useCasePayload.commentId, useCasePayload.threadId);
-    expect(mockReplyRepository.addReply).toBeCalledWith(new NewReply({
+      .toHaveBeenCalledWith(useCasePayload.commentId, useCasePayload.threadId);
+    expect(mockReplyRepository.addReply).toHaveBeenCalledWith(new NewReply({
       content: useCasePayload.content,
       owner: useCasePayload.owner,
       commentId: useCasePayload.commentId,

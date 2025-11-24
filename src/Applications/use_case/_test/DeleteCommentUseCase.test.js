@@ -35,11 +35,11 @@ describe('DeleteCommentUseCase', () => {
     await deleteCommentUseCase.execute(useCasePayload);
 
     // Assert
-    expect(mockThreadRepository.verifyAvailableThread).toBeCalledWith(useCasePayload.threadId);
+    expect(mockThreadRepository.verifyAvailableThread).toHaveBeenCalledWith(useCasePayload.threadId);
     expect(mockCommentRepository.verifyAvailableCommentInThread)
-      .toBeCalledWith(useCasePayload.commentId, useCasePayload.threadId);
+      .toHaveBeenCalledWith(useCasePayload.commentId, useCasePayload.threadId);
     expect(mockCommentRepository.verifyCommentOwner)
-      .toBeCalledWith(useCasePayload.commentId, useCasePayload.owner);
-    expect(mockCommentRepository.deleteComment).toBeCalledWith(useCasePayload.commentId);
+      .toHaveBeenCalledWith(useCasePayload.commentId, useCasePayload.owner);
+    expect(mockCommentRepository.deleteComment).toHaveBeenCalledWith(useCasePayload.commentId);
   });
 });
