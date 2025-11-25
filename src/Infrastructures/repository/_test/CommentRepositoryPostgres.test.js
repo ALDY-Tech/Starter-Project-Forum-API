@@ -156,7 +156,7 @@ describe("CommentRepositoryPostgres", () => {
       // Action & Assert
       await expect(
         commentRepositoryPostgres.verifyCommentOwner(commentId, userId)
-      ).resolves.not.toThrowError(AuthorizationError);
+      ).resolves.not.toThrow(AuthorizationError);
     });
   });
 
