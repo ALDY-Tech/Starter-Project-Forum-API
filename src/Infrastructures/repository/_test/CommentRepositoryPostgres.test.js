@@ -183,17 +183,22 @@ describe("CommentRepositoryPostgres", () => {
       const commentDate1 = new Date("2023-01-01T00:00:00.000Z");
       const commentDate2 = new Date("2023-01-02T00:00:00.000Z");
 
+      const content1 = 'Komentar A';
+      const content2 = 'Komentar B';
+
       await CommentsTableTestHelper.addComment({
         id: "comment-456",
         owner: userId,
         threadId,
         date: commentDate2,
+        content: content2
       });
       await CommentsTableTestHelper.addComment({
         id: "comment-123",
         owner: userId,
         threadId,
         date: commentDate1,
+        content: content1
       });
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});

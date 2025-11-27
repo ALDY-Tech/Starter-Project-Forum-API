@@ -149,17 +149,22 @@ describe('ReplyRepositoryPostgres', () => {
       const replyDate1 = new Date("2023-01-01T00:00:00.000Z");
       const replyDate2 = new Date("2023-01-02T00:00:00.000Z");
 
+      const content1 = 'Komentar A';
+      const content2 = 'Komentar B';
+
       await RepliesTableTestHelper.addReply({
         id: "reply-456",
         owner: userId,
         commentId,
         date: replyDate2,
+        content: content2
       });
       await RepliesTableTestHelper.addReply({
         id: "reply-123",
         owner: userId,
         commentId,
         date: replyDate1,
+        content: content1
       });
 
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
