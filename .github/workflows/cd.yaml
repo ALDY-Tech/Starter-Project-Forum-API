@@ -1,0 +1,37 @@
+name: Continuous Deployment (EC2)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest 
+
+    steps:
+      # Step 1: Checkout kode di runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Terhubung ke EC2 via SSH dan jalankan perintah deployment
+      - name: Deploy to EC2 Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}   
+          port: 22                         
+
+          script: |
+            FNM_PATH="/home/ubuntu/.local/share/fnm"
+            if [ -d "$FNM_PATH" ]; then
+              export PATH="$FNM_PATH:$PATH"
+              eval "`fnm env`"
+            fi
+            fnm use 22
+            cd ~/app
+            git pull origin main
+            npm install
+            npm run migrate up
+            pm2 restart forumapi

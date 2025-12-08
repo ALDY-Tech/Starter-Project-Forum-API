@@ -1,0 +1,70 @@
+# .github/workflows/ci.yml
+
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-app:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine 
+        env:
+          POSTGRES_DB: forumapi_test
+          POSTGRES_USER: forumapi_developer
+          POSTGRES_PASSWORD: forumapipass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U forumapi_developer -d forumapi_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' 
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Create Test Database
+        env:
+          PGHOST_TEST: localhost
+          PGPORT_TEST: 5432
+          PGUSER_TEST: forumapi_developer
+          PGPASSWORD_TEST: forumapipass
+          PGDATABASE_TEST: forumapi_test
+          ACCESS_TOKEN_KEY: 'dummykey'
+          REFRESH_TOKEN_KEY: 'dummyrefreshkey'
+          ACCESS_TOKEN_AGE: 3600
+        run: npm run db:create:test 
+
+      - name: Run Migrations
+        env:
+          ACCESS_TOKEN_KEY: 'dummykey'
+          REFRESH_TOKEN_KEY: 'dummyrefreshkey'
+          ACCESS_TOKEN_AGE: 3600
+        run: npm run migrate:test up
+
+      - name: Run Tests
+        env:
+          PGHOST_TEST: localhost
+          PGPORT_TEST: 5432
+          PGUSER_TEST: forumapi_developer
+          PGPASSWORD_TEST: forumapipass
+          PGDATABASE_TEST: forumapi_test
+          ACCESS_TOKEN_KEY: 'dummykey'
+          REFRESH_TOKEN_KEY: 'dummyrefreshkey'
+          ACCESS_TOKEN_AGE: 3600
+        run: npm run test
