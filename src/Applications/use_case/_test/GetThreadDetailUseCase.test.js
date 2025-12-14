@@ -27,6 +27,7 @@ describe('GetThreadDetailsUseCase', () => {
         date: new Date('2021-08-08T07:22:33.555Z'),
         content: 'sebuah comment',
         is_delete: false,
+        likeCount: 2,
       },
       {
         id: 'comment-456',
@@ -34,6 +35,7 @@ describe('GetThreadDetailsUseCase', () => {
         date: new Date('2021-08-08T07:26:21.338Z'),
         content: 'komentar ini telah dihapus',
         is_delete: true,
+        likeCount: 1,
       },
     ];
 
@@ -82,10 +84,10 @@ describe('GetThreadDetailsUseCase', () => {
     const threadDetails = await getThreadDetailsUseCase.execute(useCasePayload);
 
     // Assert
-    expect(mockThreadRepository.verifyAvailableThread).toHaveBeenCalledWith(threadId);
-    expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
-    expect(mockCommentRepository.getCommentsByThreadId).toHaveBeenCalledWith(threadId);
-    expect(mockReplyRepository.getRepliesByCommentIds).toHaveBeenCalledWith(['comment-123', 'comment-456']);
+    expect(mockThreadRepository.verifyAvailableThread).toBeCalledWith(threadId);
+    expect(mockThreadRepository.getThreadById).toBeCalledWith(threadId);
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(threadId);
+    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith(['comment-123', 'comment-456']);
 
     // Check Thread Details
     expect(threadDetails).toBeInstanceOf(DetailThread);
@@ -103,6 +105,7 @@ describe('GetThreadDetailsUseCase', () => {
     expect(comment1.username).toEqual(mockComments[0].username);
     expect(comment1.date).toEqual(mockComments[0].date);
     expect(comment1.content).toEqual(mockComments[0].content); // Not deleted
+    expect(comment1.likeCount).toEqual(mockComments[0].likeCount);
     expect(comment1.replies).toHaveLength(1);
 
     // Check Reply 1 (for Comment 1)
@@ -120,6 +123,7 @@ describe('GetThreadDetailsUseCase', () => {
     expect(comment2.username).toEqual(mockComments[1].username);
     expect(comment2.date).toEqual(mockComments[1].date);
     expect(comment2.content).toEqual('**komentar telah dihapus**'); // Deleted
+    expect(comment2.likeCount).toEqual(mockComments[1].likeCount);
     expect(comment2.replies).toHaveLength(1);
 
     // Check Reply 2 (for Comment 2) (Deleted)
@@ -129,5 +133,54 @@ describe('GetThreadDetailsUseCase', () => {
     expect(reply2.content).toEqual('**balasan telah dihapus**'); // Deleted
     expect(reply2.date).toEqual(mockReplies[1].date);
     expect(reply2.username).toEqual(mockReplies[1].username);
+  });
+
+  it('should return thread details with an empty comments array if no comments found', async () => {
+    // Arrange
+    const threadId = 'thread-123';
+    const useCasePayload = { threadId };
+
+    const mockThread = {
+      id: 'thread-123',
+      title: 'sebuah thread',
+      body: 'sebuah body thread',
+      date: new Date('2021-08-08T07:19:09.775Z'),
+      username: 'dicoding',
+    };
+
+    /** creating dependency of use case */
+    const mockThreadRepository = new ThreadRepository();
+    const mockCommentRepository = new CommentRepository();
+    const mockReplyRepository = new ReplyRepository();
+
+    /** mocking needed function */
+    mockThreadRepository.verifyAvailableThread = jest.fn()
+      .mockImplementation(() => Promise.resolve());
+    mockThreadRepository.getThreadById = jest.fn()
+      .mockImplementation(() => Promise.resolve(mockThread));
+    mockCommentRepository.getCommentsByThreadId = jest.fn()
+      .mockImplementation(() => Promise.resolve([]));
+    mockReplyRepository.getRepliesByCommentIds = jest.fn()
+      .mockImplementation(() => Promise.resolve([]));
+
+    /** creating use case instance */
+    const getThreadDetailsUseCase = new GetThreadDetailsUseCase({
+      threadRepository: mockThreadRepository,
+      commentRepository: mockCommentRepository,
+      replyRepository: mockReplyRepository,
+    });
+
+    // Action
+    const threadDetails = await getThreadDetailsUseCase.execute(useCasePayload);
+
+    // Assert
+    expect(mockThreadRepository.verifyAvailableThread).toBeCalledWith(threadId);
+    expect(mockThreadRepository.getThreadById).toBeCalledWith(threadId);
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(threadId);
+    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith([]);
+    
+    expect(threadDetails).toBeInstanceOf(DetailThread);
+    expect(threadDetails.comments).toHaveLength(0);
+    expect(threadDetails.comments).toEqual([]);
   });
 });
