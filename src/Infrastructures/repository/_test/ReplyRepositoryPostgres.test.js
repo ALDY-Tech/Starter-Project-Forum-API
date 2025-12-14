@@ -123,6 +123,8 @@ describe('ReplyRepositoryPostgres', () => {
       // Action & Assert
       await expect(replyRepositoryPostgres.verifyReplyOwner(replyId, userId))
         .resolves.not.toThrow(AuthorizationError);
+      await expect(replyRepositoryPostgres.verifyReplyOwner(replyId, userId))
+        .resolves.not.toThrow(NotFoundError);
     });
   });
 
@@ -146,45 +148,38 @@ describe('ReplyRepositoryPostgres', () => {
   describe('getRepliesByCommentIds function', () => {
     it('should return replies for the comments ordered by date ascending', async () => {
       // Arrange
-      const replyDate1 = new Date("2023-01-01T00:00:00.000Z");
-      const replyDate2 = new Date("2023-01-02T00:00:00.000Z");
-
-      const content1 = 'Komentar A';
-      const content2 = 'Komentar B';
-
+      const replyDate1 = new Date('2023-01-01T00:00:00.000Z');
+      const replyDate2 = new Date('2023-01-02T00:00:00.000Z');
+      
+      const content1 = 'Balasan A';
+      const content2 = 'Balasan B';
+      
       await RepliesTableTestHelper.addReply({
-        id: "reply-456",
-        owner: userId,
-        commentId,
-        date: replyDate2,
-        content: content2
+        id: 'reply-456', owner: userId, commentId, date: replyDate2, content: content2,
       });
       await RepliesTableTestHelper.addReply({
-        id: "reply-123",
-        owner: userId,
-        commentId,
-        date: replyDate1,
-        content: content1
+        id: 'reply-123', owner: userId, commentId, date: replyDate1, content: content1,
       });
 
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
       // Action
-      const replies = await replyRepositoryPostgres.getRepliesByCommentIds([
-        commentId,
-      ]);
+      const replies = await replyRepositoryPostgres.getRepliesByCommentIds([commentId]);
 
-      // Assert replies[0]
-      expect(replies[0].id).toEqual("reply-123");
-      expect(replies[0].username).toEqual("dicoding");
+      // Assert
+      expect(replies).toHaveLength(2);
+      
+      // Assert replies[0] (Balasan A)
+      expect(replies[0].id).toEqual('reply-123');
+      expect(replies[0].username).toEqual('dicoding');
       expect(replies[0].date).toEqual(replyDate1);
       expect(replies[0].content).toEqual(content1);
       expect(replies[0].is_delete).toEqual(false);
       expect(replies[0].comment_id).toEqual(commentId);
 
-      // Assert replies[1]
-      expect(replies[1].id).toEqual("reply-456");
-      expect(replies[1].username).toEqual("dicoding");
+      // Assert replies[1] (Balasan B)
+      expect(replies[1].id).toEqual('reply-456');
+      expect(replies[1].username).toEqual('dicoding');
       expect(replies[1].date).toEqual(replyDate2);
       expect(replies[1].content).toEqual(content2);
       expect(replies[1].is_delete).toEqual(false);

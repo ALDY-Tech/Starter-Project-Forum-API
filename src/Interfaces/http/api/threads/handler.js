@@ -1,21 +1,17 @@
+const autoBind = require('auto-bind');
 const AddThreadUseCase = require('../../../../Applications/use_case/AddThreadUseCase');
 const AddCommentUseCase = require('../../../../Applications/use_case/AddCommentUseCase');
 const DeleteCommentUseCase = require('../../../../Applications/use_case/DeleteCommentUseCase');
 const AddReplyUseCase = require('../../../../Applications/use_case/AddReplyUseCase');
 const DeleteReplyUseCase = require('../../../../Applications/use_case/DeleteReplyUseCase');
 const GetThreadDetailsUseCase = require('../../../../Applications/use_case/GetThreadDetailsUseCase');
+const LikeUnlikeCommentUseCase = require('../../../../Applications/use_case/LikeUnlikeCommentUseCase');
 
 class ThreadsHandler {
   constructor(container) {
     this._container = container;
 
-    // Bind 'this' to handlers
-    this.postThreadHandler = this.postThreadHandler.bind(this);
-    this.getThreadDetailsHandler = this.getThreadDetailsHandler.bind(this);
-    this.postCommentHandler = this.postCommentHandler.bind(this);
-    this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
-    this.postReplyHandler = this.postReplyHandler.bind(this);
-    this.deleteReplyHandler = this.deleteReplyHandler.bind(this);
+    autoBind(this);
   }
 
   async postThreadHandler(request, h) {
@@ -119,6 +115,22 @@ class ThreadsHandler {
       commentId,
       replyId,
       owner,
+    });
+
+    return {
+      status: 'success',
+    };
+  }
+
+  async putLikeCommentHandler(request, h) {
+    const likeUnlikeCommentUseCase = this._container.getInstance(LikeUnlikeCommentUseCase.name);
+    const { id: userId } = request.auth.credentials;
+    const { threadId, commentId } = request.params;
+
+    await likeUnlikeCommentUseCase.execute({
+      threadId,
+      commentId,
+      userId,
     });
 
     return {
