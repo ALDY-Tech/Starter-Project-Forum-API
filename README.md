@@ -424,3 +424,4 @@ Untuk melihat apa semua file sudah dicoverage semua
 ```bash
 npm run test:watch
 ```
+
