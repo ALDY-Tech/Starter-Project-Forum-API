@@ -3,29 +3,19 @@ name: Continuous Deployment
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      HOST: ${{ secrets.HOST }}
-      USER: ${{ secrets.USER }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: whoami
-          # script: |
-            # cd /home/ubuntu/forum-api
-            # git pull origin master
-            # npm install --production
-            # npm run migrate up
-            # pm2 restart forum-api || pm2 start npm --name "forum-api" -- run start
