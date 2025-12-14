@@ -41,13 +41,13 @@ describe('DeleteReplyUseCase', () => {
     await deleteReplyUseCase.execute(useCasePayload);
 
     // Assert
-    expect(mockThreadRepository.verifyAvailableThread).toHaveBeenCalledWith(useCasePayload.threadId);
+    expect(mockThreadRepository.verifyAvailableThread).toBeCalledWith(useCasePayload.threadId);
     expect(mockCommentRepository.verifyAvailableCommentInThread)
-      .toHaveBeenCalledWith(useCasePayload.commentId, useCasePayload.threadId);
+      .toBeCalledWith(useCasePayload.commentId, useCasePayload.threadId);
     expect(mockReplyRepository.verifyAvailableReplyInComment)
-      .toHaveBeenCalledWith(useCasePayload.replyId, useCasePayload.commentId);
+      .toBeCalledWith(useCasePayload.replyId, useCasePayload.commentId);
     expect(mockReplyRepository.verifyReplyOwner)
-      .toHaveBeenCalledWith(useCasePayload.replyId, useCasePayload.owner);
-    expect(mockReplyRepository.deleteReply).toHaveBeenCalledWith(useCasePayload.replyId);
+      .toBeCalledWith(useCasePayload.replyId, useCasePayload.owner);
+    expect(mockReplyRepository.deleteReply).toBeCalledWith(useCasePayload.replyId);
   });
 });
