@@ -15,7 +15,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }} # Pastikan ini sesuai (root atau ubuntu?)
-          key: ${{ secrets.VPS_SSH_KEY }}
+          key: ${{ secrets.VPS_SSHKEY }}
           port: 22
           # Timeout diperpanjang jaga-jaga npm install lama
           timeout: 10m 
