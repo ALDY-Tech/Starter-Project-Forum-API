@@ -16,12 +16,12 @@ jobs:
         image: postgres:17-alpine 
         env:
           POSTGRES_DB: forumapi_test
-          POSTGRES_USER: forumapi_developer
-          POSTGRES_PASSWORD: forumapipass
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U forumapi_developer -d forumapi_test"
+          --health-cmd "pg_isready -U postgres -d forumapi_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -42,8 +42,8 @@ jobs:
         env:
           PGHOST_TEST: localhost
           PGPORT_TEST: 5432
-          PGUSER_TEST: forumapi_developer
-          PGPASSWORD_TEST: forumapipass
+          PGUSER_TEST: postgres
+          PGPASSWORD_TEST: 1234
           PGDATABASE_TEST: forumapi_test
           ACCESS_TOKEN_KEY: 'dummykey'
           REFRESH_TOKEN_KEY: 'dummyrefreshkey'
@@ -61,8 +61,8 @@ jobs:
         env:
           PGHOST_TEST: localhost
           PGPORT_TEST: 5432
-          PGUSER_TEST: forumapi_developer
-          PGPASSWORD_TEST: forumapipass
+          PGUSER_TEST: postgres
+          PGPASSWORD_TEST: 1234
           PGDATABASE_TEST: forumapi_test
           ACCESS_TOKEN_KEY: 'dummykey'
           REFRESH_TOKEN_KEY: 'dummyrefreshkey'
