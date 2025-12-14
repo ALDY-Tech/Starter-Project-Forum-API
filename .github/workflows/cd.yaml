@@ -36,8 +36,8 @@ jobs:
             fnm use 22
 
             # 2. Masuk ke Folder Project
-            # Ganti 'garuda-game-api' sesuai nama folder asli Anda
-            TARGET_DIR="$HOME/garuda-game-api"
+            # Ganti 'forumapi' sesuai nama folder asli Anda
+            TARGET_DIR="$HOME/forumapi"
             
             if [ ! -d "$TARGET_DIR" ]; then
               echo "❌ Direktori $TARGET_DIR tidak ditemukan! Pastikan sudah clone manual."
@@ -63,6 +63,6 @@ jobs:
             # 6. Restart PM2
             echo "🚀 Restarting Server..."
             # --update-env penting jika Anda mengubah file .env atau variabel environment
-            pm2 restart forumapi --update-env || pm2 start src/server.js --name forumapi
+            pm2 restart forumapi --update-env || pm2 start src/app.js --name forumapi
 
             echo "✅ Deployment Success!"
