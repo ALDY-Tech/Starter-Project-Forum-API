@@ -10,28 +10,59 @@ jobs:
     runs-on: ubuntu-latest 
 
     steps:
-      # Step 1: Checkout kode di runner
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Step 2: Terhubung ke VPS via SSH dan jalankan perintah deployment
       - name: Deploy to VPS Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}   
-          port: 22                         
-
+          username: ${{ secrets.VPS_USER }} # Pastikan ini sesuai (root atau ubuntu?)
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          # Timeout diperpanjang jaga-jaga npm install lama
+          timeout: 10m 
+          
           script: |
-            FNM_PATH="/home/ubuntu/.local/share/fnm"
-            if [ -d "$FNM_PATH" ]; then
-              export PATH="$FNM_PATH:$PATH"
+            # 1. Setup Environment (PENTING)
+            # Load .bashrc agar settingan server terbaca (opsional tapi disarankan)
+            [ -f ~/.bashrc ] && source ~/.bashrc
+            
+            # Setup FNM manual (seperti kode Anda, tapi dinamis terhadap user)
+            export FNM_DIR="$HOME/.local/share/fnm"
+            if [ -d "$FNM_DIR" ]; then
+              export PATH="$FNM_DIR:$PATH"
               eval "`fnm env`"
             fi
+            
+            # Pastikan Node aktif
             fnm use 22
-            cd ~/app
+
+            # 2. Masuk ke Folder Project
+            # Ganti 'garuda-game-api' sesuai nama folder asli Anda
+            TARGET_DIR="$HOME/garuda-game-api"
+            
+            if [ ! -d "$TARGET_DIR" ]; then
+              echo "❌ Direktori $TARGET_DIR tidak ditemukan! Pastikan sudah clone manual."
+              exit 1
+            fi
+
+            cd "$TARGET_DIR"
+
+            # 3. Update Code
+            echo "⬇️  Pulling latest code..."
             git pull origin main
-            npm install
-            npm run migrate up
-            pm2 restart forumapi
+
+            # 4. Install Dependencies
+            # Gunakan 'npm ci' (Clean Install) lebih aman untuk CI/CD daripada 'npm install'
+            echo "📦 Installing dependencies..."
+            npm ci --production 
+
+            # 5. Database Migration
+            # Pastikan script "migrate" ada di package.json
+            echo "🗄️  Running migrations..."
+            npm run migrate 
+
+            # 6. Restart PM2
+            echo "🚀 Restarting Server..."
+            # --update-env penting jika Anda mengubah file .env atau variabel environment
+            pm2 restart forumapi --update-env || pm2 start src/server.js --name forumapi
+
+            echo "✅ Deployment Success!"
