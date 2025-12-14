@@ -1,68 +1,31 @@
-name: Continuous Deployment (VPS Orange)
+name: Continuous Deployment
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - master
 
 jobs:
   deploy:
-    name: Deploy to VPS
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ secrets.HOST }}
+      USER: ${{ secrets.USER }}
 
     steps:
-      - name: Deploy to VPS Server
-        uses: appleboy/ssh-action@master
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }} # Pastikan ini sesuai (root atau ubuntu?)
-          key: ${{ secrets.VPS_SSHKEY }}
-          port: 22
-          # Timeout diperpanjang jaga-jaga npm install lama
-          timeout: 10m 
-          
-          script: |
-            # 1. Setup Environment (PENTING)
-            # Load .bashrc agar settingan server terbaca (opsional tapi disarankan)
-            [ -f ~/.bashrc ] && source ~/.bashrc
-            
-            # Setup FNM manual (seperti kode Anda, tapi dinamis terhadap user)
-            export FNM_DIR="$HOME/.local/share/fnm"
-            if [ -d "$FNM_DIR" ]; then
-              export PATH="$FNM_DIR:$PATH"
-              eval "`fnm env`"
-            fi
-            
-            # Pastikan Node aktif
-            fnm use 22
-
-            # 2. Masuk ke Folder Project
-            # Ganti 'forumapi' sesuai nama folder asli Anda
-            TARGET_DIR="$HOME/forumapi"
-            
-            if [ ! -d "$TARGET_DIR" ]; then
-              echo "❌ Direktori $TARGET_DIR tidak ditemukan! Pastikan sudah clone manual."
-              exit 1
-            fi
-
-            cd "$TARGET_DIR"
-
-            # 3. Update Code
-            echo "⬇️  Pulling latest code..."
-            git pull origin main
-
-            # 4. Install Dependencies
-            # Gunakan 'npm ci' (Clean Install) lebih aman untuk CI/CD daripada 'npm install'
-            echo "📦 Installing dependencies..."
-            npm ci --production 
-
-            # 5. Database Migration
-            # Pastikan script "migrate" ada di package.json
-            echo "🗄️  Running migrations..."
-            npm run migrate 
-
-            # 6. Restart PM2
-            echo "🚀 Restarting Server..."
-            # --update-env penting jika Anda mengubah file .env atau variabel environment
-            pm2 restart forumapi --update-env || pm2 start src/app.js --name forumapi
-
-            echo "✅ Deployment Success!"
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: whoami
+          # script: |
+            # cd /home/ubuntu/forum-api
+            # git pull origin master
+            # npm install --production
+            # npm run migrate up
+            # pm2 restart forum-api || pm2 start npm --name "forum-api" -- run start
