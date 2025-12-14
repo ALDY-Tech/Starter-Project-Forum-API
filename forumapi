@@ -48,7 +48,7 @@ server {
     listen 80;
     listen [::]:80;
     
-    server_name apiforum.wandhx.site;
+    server_name tame-files-change-sleepily.st.a.dcdg.xyz www.tame-files-change-sleepily.st.a.dcdg.xyz;
     return 404; # managed by Certbot
 
 

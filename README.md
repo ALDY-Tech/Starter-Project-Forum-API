@@ -4,6 +4,8 @@
 
 Implementasi **RESTful API** untuk aplikasi forum diskusi komunitas game Shogi. Proyek ini dibangun sebagai bagian dari submisi *Backend Expert Course* di Dicoding, menerapkan prinsip **Clean Architecture**, **TDD (Test-Driven Development)**, dan keamanan autentikasi modern.
 
+Link: https://www.tame-files-change-sleepily.st.a.dcdg.xyz
+
 ## 📋 Daftar Isi
 - [Fitur Utama](#-fitur-utama)
 - [Arsitektur & Struktur Proyek](#-arsitektur--struktur-proyek)
