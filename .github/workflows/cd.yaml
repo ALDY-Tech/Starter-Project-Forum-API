@@ -19,4 +19,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSHKEY }}
           port: ${{ secrets.PORT }}
-          script: whoami
+          script: |
+            cd /home/ubuntu/forum-api
+            git pull origin main
+            npm install --production
+            pm2 restart forum-api || pm2 start index.js --name forum-api
